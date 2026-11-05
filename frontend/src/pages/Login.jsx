@@ -18,7 +18,7 @@ export function Login() {
     setErr(er); if (Object.keys(er).length) return;
     setBusy(true);
     try {
-      const r = await api(`/api/auth/${mode === "login" ? "login" : "signup"}`, { method: "POST", body: f });
+      const r = await api(`api/auth/${mode === "login" ? "login" : "signup"}`, { method: "POST", body: f });
       localStorage.token = r.access_token; nav("/");
     } catch (x) { toast(x.message, "err"); } finally { setBusy(false); }
   }
