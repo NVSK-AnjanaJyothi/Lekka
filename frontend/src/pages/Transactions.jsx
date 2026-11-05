@@ -75,7 +75,7 @@ export function Transactions() {
     e.target.value = "";
   }
   async function exportCsv() {
-    const res = await fetch((import.meta.env.VITE_API_URL || "http://localhost:8000") + "/api/export/csv", { headers: { Authorization: `Bearer ${localStorage.token}` } });
+    const res = await fetch((import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/+$/, "") + "/api/export/csv", { headers: { Authorization: `Bearer ${localStorage.token}` } });
     const url = URL.createObjectURL(await res.blob()); const a = document.createElement("a"); a.href = url; a.download = "spendwise.csv"; a.click(); URL.revokeObjectURL(url);
   }
   async function recategorize() {
