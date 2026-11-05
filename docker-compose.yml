@@ -1,0 +1,24 @@
+# PostgreSQL + API in one command:  docker compose up --build
+# Then seed demo data:              docker compose exec api python seed.py
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: spendwise
+      POSTGRES_PASSWORD: spendwise
+      POSTGRES_DB: spendwise
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spendwise"]
+      interval: 5s
+      retries: 10
+  api:
+    build: ./backend
+    env_file: ./backend/.env
+    environment:
+      DATABASE_URL: postgresql://spendwise:spendwise@db:5432/spendwise
+    ports: ["8000:8000"]
+    depends_on:
+      db: { condition: service_healthy }
+volumes:
+  pgdata:
