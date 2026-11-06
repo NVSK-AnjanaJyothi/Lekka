@@ -1,5 +1,10 @@
 # Spendwise — AI Expense Tracker (₹)
 
+**Live demo:** https://spendwise-nvskaj.vercel.app
+**API docs:** https://spendwise-lxpp.onrender.com/docs
+**Demo login:** demo@spendwise.in / demo1234
+**Stack:** React · FastAPI · PostgreSQL (Neon) · Groq LLM · hosted on Vercel + Render
+
 FastAPI + SQLAlchemy + SQLite backend, React + Vite + Tailwind + Recharts frontend, an OpenAI-compatible LLM API (free Groq tier by default, tool calling) backend-only.
 
 ## Run locally
