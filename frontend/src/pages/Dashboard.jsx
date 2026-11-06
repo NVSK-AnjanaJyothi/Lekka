@@ -3,6 +3,10 @@ import { PieChart, Pie, Cell, LineChart, Line, BarChart, Bar, XAxis, YAxis, Tool
 import { api, inr, thisMonth } from "../api.js";
 import { Skeleton, ErrorBox, Empty } from "../ui.jsx";
 
+const monthLabel = (m) => new Date(m + "-01T00:00:00").toLocaleString("en-IN", { month: "short", year: "2-digit" });
+const short = (n) => "₹" + (n >= 1000 ? n / 1000 + "k" : n);
+const legendText = (v) => <span className="text-slate-600 dark:text-slate-300">{v}</span>;
+const axisProps = { tick: { fontSize: 12 }, tickMargin: 8 };
 const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6", "#f97316", "#64748b"];
 
 export function Dashboard() {
@@ -36,16 +40,16 @@ export function Dashboard() {
       </div>
       {!d ? <Skeleton className="h-72" /> : (
         <div className="grid gap-4 lg:grid-cols-2">
-          <div className="card h-80"><h3 className="mb-2 font-medium">Spending by category</h3>
+          <div className="card flex h-96 flex-col"><h3 className="mb-2 font-medium">Spending by category</h3>
             {d.by_category.length === 0 ? <Empty>No expenses this month.</Empty> : (
-              <ResponsiveContainer><PieChart><Pie data={d.by_category} dataKey="total" nameKey="category" innerRadius={55} outerRadius={90}>
-                {d.by_category.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}</Pie><Tooltip formatter={inr} /><Legend /></PieChart></ResponsiveContainer>)}
+              <div className="min-h-0 flex-1"><ResponsiveContainer><PieChart><Pie data={d.by_category} dataKey="total" nameKey="category" innerRadius="55%" outerRadius="80%" cy="45%">
+                {d.by_category.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}</Pie><Tooltip formatter={inr} /><Legend iconType="circle" iconSize={10} formatter={legendText} wrapperStyle={{ fontSize: 13 }} /></PieChart></ResponsiveContainer></div>)}
           </div>
-          <div className="card h-80"><h3 className="mb-2 font-medium">Monthly spending trend</h3>
-            <ResponsiveContainer><LineChart data={d.monthly}><XAxis dataKey="month" /><YAxis tickFormatter={inr} width={70} /><Tooltip formatter={inr} /><Line dataKey="expense" stroke="#ef4444" strokeWidth={2} /></LineChart></ResponsiveContainer></div>
-          <div className="card h-80"><h3 className="mb-2 font-medium">Income vs expense</h3>
-            <ResponsiveContainer><BarChart data={d.monthly}><XAxis dataKey="month" /><YAxis tickFormatter={inr} width={70} /><Tooltip formatter={inr} /><Legend /><Bar dataKey="income" fill="#10b981" /><Bar dataKey="expense" fill="#ef4444" /></BarChart></ResponsiveContainer></div>
-          <div className="card h-80 overflow-auto"><h3 className="mb-2 font-medium">Top merchants</h3>
+          <div className="card flex h-96 flex-col"><h3 className="mb-2 font-medium">Monthly spending trend</h3>
+            <div className="min-h-0 flex-1"><ResponsiveContainer><LineChart data={d.monthly}><XAxis dataKey="month" tickFormatter={monthLabel} interval={0} padding={{ left: 16, right: 16 }} {...axisProps} /><YAxis tickFormatter={short} width={52} {...axisProps} /><Tooltip formatter={inr} /><Line dataKey="expense" stroke="#ef4444" strokeWidth={2} /></LineChart></ResponsiveContainer></div></div>
+          <div className="card flex h-96 flex-col"><h3 className="mb-2 font-medium">Income vs expense</h3>
+            <div className="min-h-0 flex-1"><ResponsiveContainer><BarChart data={d.monthly}><XAxis dataKey="month" tickFormatter={monthLabel} interval={0} padding={{ left: 16, right: 16 }} {...axisProps} /><YAxis tickFormatter={short} width={52} {...axisProps} /><Tooltip formatter={inr} /><Legend iconType="circle" iconSize={10} formatter={legendText} wrapperStyle={{ fontSize: 13 }} /><Bar dataKey="income" fill="#10b981" /><Bar dataKey="expense" fill="#ef4444" /></BarChart></ResponsiveContainer></div></div>
+          <div className="card h-96 overflow-auto"><h3 className="mb-2 font-medium">Top merchants</h3>
             {d.top_merchants.length === 0 ? <Empty>No merchant data.</Empty> : <ol className="space-y-2">{d.top_merchants.map((m) => (
               <li key={m.merchant} className="flex justify-between text-sm"><span>{m.merchant}</span><span className="font-medium">{inr(m.total)}</span></li>))}</ol>}
           </div>
