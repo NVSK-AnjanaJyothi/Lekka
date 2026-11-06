@@ -16,7 +16,7 @@ def check_pw(p: str, h: str) -> bool:
     return bcrypt.checkpw(p.encode(), h.encode())
 
 def make_token(uid: int) -> str:
-    return jwt.encode({"sub": str(uid), "exp": int(time.time()) + 7 * 86400}, SECRET, algorithm="HS256")
+    return jwt.encode({"sub": str(uid), "exp": int(time.time()) + 1 * 86400}, SECRET, algorithm="HS256")
 
 def current_user(cred: HTTPAuthorizationCredentials = Depends(bearer), db: Session = Depends(get_db)) -> User:
     if not cred:
