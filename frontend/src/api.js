@@ -1,4 +1,4 @@
-const BASE = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/+$/, "");
+const BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 export const inr = (n) => "₹" + Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 });
 export const thisMonth = () => new Date().toISOString().slice(0, 7);
 

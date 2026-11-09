@@ -9,8 +9,8 @@ from sqlalchemy.orm import Session
 from . import ai, queries as Q
 from .auth import current_user, hash_pw, check_pw, make_token
 from .database import Base, engine, get_db
-from .models import User, Category, Transaction as T, Budget, DEFAULT_CATEGORIES
-from .schemas import Credentials, TxIn, TxOut, CategoryIn, BudgetIn, NLIn, ChatIn
+from .models import User, Category, Transaction as T, Budget, FestivalMonth, SavingsGoal, DEFAULT_CATEGORIES
+from .schemas import Credentials, TxIn, TxOut, CategoryIn, BudgetIn, FestivalIn, GoalIn, ContributeIn, NLIn, ChatIn
 
 Base.metadata.create_all(engine)
 app = FastAPI(title="Spendwise API")
@@ -128,6 +128,68 @@ def del_budget(bid: int, u: User = Depends(current_user), db: Session = Depends(
     row = db.get(Budget, bid)
     if not row or row.user_id != u.id: raise HTTPException(404, "Budget not found")
     db.delete(row); db.commit()
+
+# ---- festival months
+@app.put("/api/festival-months")
+def set_festival_month(b: FestivalIn, u: User = Depends(current_user), db: Session = Depends(get_db)):
+    row = db.scalar(select(FestivalMonth).where(FestivalMonth.user_id == u.id, FestivalMonth.month == b.month))
+    if row: row.label = b.label
+    else:
+        row = FestivalMonth(user_id=u.id, month=b.month, label=b.label); db.add(row)
+    db.commit(); db.refresh(row)
+    return {"id": row.id, "month": row.month, "label": row.label}
+
+@app.delete("/api/festival-months/{fid}", status_code=204)
+def del_festival_month(fid: int, u: User = Depends(current_user), db: Session = Depends(get_db)):
+    row = db.get(FestivalMonth, fid)
+    if not row or row.user_id != u.id: raise HTTPException(404, "Festival month not found")
+    db.delete(row); db.commit()
+
+@app.get("/api/festival/compare")
+def festival_compare(include_current: bool = False, u: User = Depends(current_user), db: Session = Depends(get_db)):
+    rows = db.scalars(select(FestivalMonth).where(FestivalMonth.user_id == u.id)).all()
+    return Q.festival_compare(db, u.id, rows, include_current)
+
+# ---- savings goals
+def own_goal(db, uid, gid):
+    row = db.get(SavingsGoal, gid)
+    if not row or row.user_id != uid:
+        raise HTTPException(404, "Goal not found")
+    return row
+
+@app.get("/api/goals")
+def list_goals(u: User = Depends(current_user), db: Session = Depends(get_db)):
+    rows = db.scalars(select(SavingsGoal).where(SavingsGoal.user_id == u.id)).all()
+    out = [Q.goal_view(g) for g in rows]
+    out.sort(key=lambda g: (g["status"] == "done", g["target_date"], g["id"]))
+    return out
+
+@app.post("/api/goals", status_code=201)
+def add_goal(g: GoalIn, u: User = Depends(current_user), db: Session = Depends(get_db)):
+    if g.target_date < date.today():
+        raise HTTPException(422, "Target date must be today or later")
+    row = SavingsGoal(user_id=u.id, **g.model_dump()); db.add(row); db.commit(); db.refresh(row)
+    return Q.goal_view(row)
+
+@app.put("/api/goals/{gid}")
+def edit_goal(gid: int, g: GoalIn, u: User = Depends(current_user), db: Session = Depends(get_db)):
+    row = own_goal(db, u.id, gid)
+    for k, v in g.model_dump().items(): setattr(row, k, v)
+    db.commit(); db.refresh(row)
+    return Q.goal_view(row)
+
+@app.post("/api/goals/{gid}/contribute")
+def contribute_goal(gid: int, b: ContributeIn, u: User = Depends(current_user), db: Session = Depends(get_db)):
+    row = own_goal(db, u.id, gid)
+    new = round(row.saved_amount + b.amount, 2)
+    if new >= 1e9: raise HTTPException(422, "Saved amount is too large")
+    row.saved_amount = new
+    db.commit(); db.refresh(row)
+    return Q.goal_view(row)
+
+@app.delete("/api/goals/{gid}", status_code=204)
+def del_goal(gid: int, u: User = Depends(current_user), db: Session = Depends(get_db)):
+    db.delete(own_goal(db, u.id, gid)); db.commit()
 
 # ---- dashboard
 @app.get("/api/dashboard")

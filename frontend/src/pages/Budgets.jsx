@@ -23,7 +23,7 @@ export function Budgets() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold">Monthly budgets</h2>
+        <div><h2 className="text-2xl font-bold tracking-tight">Monthly budgets</h2><p className="text-sm text-slate-500">Set limits and track your progress</p></div>
         <input aria-label="Month" type="month" className="input w-auto" value={month} onChange={(e) => e.target.value && setMonth(e.target.value)} />
       </div>
       <form onSubmit={save} className="card flex flex-wrap gap-2">

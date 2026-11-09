@@ -1,4 +1,4 @@
-"""Creates demo user demo@spendwise.in / demo1234 with ~3 months of Indian transactions."""
+"""Creates demo user demo@lekka.in / demo1234 with ~3 months of Indian transactions."""
 import random
 from datetime import date, timedelta
 from sqlalchemy import select
@@ -9,9 +9,9 @@ from app.auth import hash_pw
 random.seed(7)
 Base.metadata.create_all(engine)
 db = SessionLocal()
-if db.scalar(select(User).where(User.email == "demo@spendwise.in")):
+if db.scalar(select(User).where(User.email == "demo@lekka.in")):
     print("Demo user already exists."); raise SystemExit
-u = User(email="demo@spendwise.in", password_hash=hash_pw("demo1234")); db.add(u); db.commit()
+u = User(email="demo@lekka.in", password_hash=hash_pw("demo1234")); db.add(u); db.commit()
 
 SPEND = [("Zomato", "Food", 150, 650, "UPI"), ("Swiggy", "Food", 120, 700, "UPI"), ("BigBasket", "Food", 400, 1800, "Card"),
          ("Uber", "Transport", 90, 450, "UPI"), ("Rapido", "Transport", 50, 200, "UPI"), ("Amazon", "Shopping", 300, 3500, "Card"),
@@ -35,4 +35,4 @@ for m in range(2, -1, -1):
 cm = f"{today.year}-{today.month:02d}"
 for cat, lim in [("Food", 8000), ("Transport", 2500), ("Shopping", 6000), ("Entertainment", 1500)]:
     db.add(Budget(user_id=u.id, category=cat, month=cm, limit=lim))
-db.commit(); print("Seeded. Login: demo@spendwise.in / demo1234")
+db.commit(); print("Seeded. Login: demo@lekka.in / demo1234")

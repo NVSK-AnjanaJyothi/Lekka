@@ -75,8 +75,8 @@ export function Transactions() {
     e.target.value = "";
   }
   async function exportCsv() {
-    const res = await fetch((import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/+$/, "") + "/api/export/csv", { headers: { Authorization: `Bearer ${localStorage.token}` } });
-    const url = URL.createObjectURL(await res.blob()); const a = document.createElement("a"); a.href = url; a.download = "spendwise.csv"; a.click(); URL.revokeObjectURL(url);
+    const res = await fetch((import.meta.env.VITE_API_URL || "http://localhost:8000") + "/api/export/csv", { headers: { Authorization: `Bearer ${localStorage.token}` } });
+    const url = URL.createObjectURL(await res.blob()); const a = document.createElement("a"); a.href = url; a.download = "lekka.csv"; a.click(); URL.revokeObjectURL(url);
   }
   async function recategorize() {
     try { const r = await api("/api/ai/categorize", { method: "POST" }); toast(`Re-categorized ${r.updated} transactions`); load(); } catch (x) { toast(x.message, "err"); }
@@ -89,6 +89,7 @@ export function Transactions() {
 
   return (
     <div className="space-y-4">
+      <div><h2 className="text-2xl font-bold tracking-tight">Transactions</h2><p className="text-sm text-slate-500">Add, search and manage your income and expenses</p></div>
       <form onSubmit={parse} className="card flex flex-col gap-2 sm:flex-row">
         <input aria-label="Describe a transaction" className="input" placeholder='Try: "paid 450 for Zomato yesterday via UPI"' value={nl} onChange={(e) => setNl(e.target.value)} minLength={3} required />
         <button className="btn whitespace-nowrap" disabled={nlBusy}>{nlBusy ? "Reading…" : "✨ Add with AI"}</button>
@@ -111,10 +112,10 @@ export function Transactions() {
       {err ? <ErrorBox msg={err} retry={load} /> : !data ? <Skeleton className="h-64" /> : data.items.length === 0 ? <div className="card"><Empty>No transactions match.</Empty></div> : (
         <div className="card overflow-x-auto p-0">
           <table className="w-full text-left text-sm"><caption className="sr-only">Transactions</caption>
-            <thead className="border-b border-slate-200 text-slate-500 dark:border-slate-800"><tr>{["Date", "Merchant", "Category", "Method", "Amount", ""].map((h) => <th key={h} scope="col" className="px-4 py-3 font-medium">{h}</th>)}</tr></thead>
+            <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:bg-slate-800/40"><tr>{["Date", "Merchant", "Category", "Method", "Amount", ""].map((h) => <th key={h} scope="col" className="px-4 py-3 font-medium">{h}</th>)}</tr></thead>
             <tbody>{data.items.map((t) => (
-              <tr key={t.id} className="border-b border-slate-100 dark:border-slate-800/60">
-                <td className="px-4 py-3">{t.date}</td><td className="px-4 py-3">{t.merchant || t.note || "—"}</td><td className="px-4 py-3">{t.category}</td><td className="px-4 py-3">{t.payment_method}</td>
+              <tr key={t.id} className="border-b border-slate-100 transition hover:bg-slate-50 dark:border-slate-800/60 dark:hover:bg-slate-800/40">
+                <td className="px-4 py-3">{t.date}</td><td className="px-4 py-3">{t.merchant || t.note || "—"}</td><td className="px-4 py-3"><span className="badge">{t.category}</span></td><td className="px-4 py-3">{t.payment_method}</td>
                 <td className={`px-4 py-3 font-medium ${t.type === "income" ? "text-emerald-600" : ""}`}>{t.type === "income" ? "+" : "−"}{inr(t.amount)}</td>
                 <td className="whitespace-nowrap px-4 py-3"><button className="btn-ghost mr-1" onClick={() => setEditing(t)} aria-label={`Edit ${t.merchant}`}>Edit</button><button className="btn-ghost" onClick={() => remove(t.id)} aria-label={`Delete ${t.merchant}`}>Delete</button></td>
               </tr>))}</tbody></table>

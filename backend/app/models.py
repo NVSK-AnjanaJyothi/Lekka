@@ -38,3 +38,20 @@ class Budget(Base):
     category: Mapped[str] = mapped_column(String(50))
     month: Mapped[str] = mapped_column(String(7))  # YYYY-MM
     limit: Mapped[float] = mapped_column(Float)
+
+class FestivalMonth(Base):
+    __tablename__ = "festival_months"
+    __table_args__ = (UniqueConstraint("user_id", "month"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    month: Mapped[str] = mapped_column(String(7))  # YYYY-MM
+    label: Mapped[str] = mapped_column(String(50))  # e.g. Diwali, Wedding season
+
+class SavingsGoal(Base):
+    __tablename__ = "savings_goals"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    name: Mapped[str] = mapped_column(String(100))
+    target_amount: Mapped[float] = mapped_column(Float)
+    saved_amount: Mapped[float] = mapped_column(Float, default=0.0)
+    target_date: Mapped[date] = mapped_column(Date)

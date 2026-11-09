@@ -29,6 +29,21 @@ class BudgetIn(BaseModel):
     month: str = Field(pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
     limit: float = Field(gt=0, lt=1e9)
 
+class FestivalIn(BaseModel):
+    model_config = {"str_strip_whitespace": True}
+    month: str = Field(pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
+    label: str = Field(min_length=1, max_length=50)
+
+class GoalIn(BaseModel):
+    model_config = {"str_strip_whitespace": True}
+    name: str = Field(min_length=1, max_length=100)
+    target_amount: float = Field(gt=0, lt=1e9)
+    saved_amount: float = Field(default=0, ge=0, lt=1e9)
+    target_date: date
+
+class ContributeIn(BaseModel):
+    amount: float = Field(gt=0, lt=1e9)
+
 class NLIn(BaseModel):
     text: str = Field(min_length=3, max_length=300)
 
