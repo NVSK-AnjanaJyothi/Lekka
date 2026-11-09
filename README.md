@@ -1,8 +1,8 @@
-# Spendwise — AI Expense Tracker (₹)
+# Lekka — AI Expense Tracker (₹)
 
-**Live demo:** https://spendwise-nvskaj.vercel.app
-**API docs:** https://spendwise-lxpp.onrender.com/docs
-**Demo login:** demo@spendwise.in / demo1234
+**Live demo:** https://lekka-yourmoney-explained.vercel.app/
+**API docs:** https://spendwise-lxpp.onrender.com
+**Demo login:** demo@lekka.in / demo1234
 **Stack:** React · FastAPI · PostgreSQL (Neon) · Groq LLM · hosted on Vercel + Render
 
 FastAPI + SQLAlchemy + SQLite backend, React + Vite + Tailwind + Recharts frontend, an OpenAI-compatible LLM API (free Groq tier by default, tool calling) backend-only.
@@ -13,7 +13,7 @@ FastAPI + SQLAlchemy + SQLite backend, React + Vite + Tailwind + Recharts fronte
 cd backend && python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env        # add AI_API_KEY (free from console.groq.com) and a long SECRET_KEY
-python seed.py              # demo@spendwise.in / demo1234, 3 months of data
+python seed.py              # demo@Lekka.in / demo1234, 3 months of data
 uvicorn app.main:app --reload   # http://localhost:8000/docs
 
 # frontend (new terminal)
